@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/ajummer/JS-WEB-CAT-SHELTER#readme",
   "dependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "serve-favicon": "^2.5.0"
   }
 }

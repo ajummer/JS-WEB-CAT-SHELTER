@@ -1,9 +1,8 @@
 const http = require("http");
-const homeTemplate = require("./views/home/home.js")
-const siteCss = require("./content/styles/site.js")
-const addBreedTemplate = require("./views/addBreed.js")
-const addCatTemplate = require("./views/addCat.js")
-const catTemplate = require("./catTemplate.js")
+const fs = require("fs/promises");
+
+
+
 const port = 5000
 
 const cats = [
@@ -21,32 +20,42 @@ const cats = [
     }
 ]
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
     const { url } = req;
+    console.log(url)
     if (url === "/") {
         const imagePattern = /{{imageUrl}}/g;
         const namePattern = /{{name}}/g;
         const breedPattern = /{{breed}}/g;
         const descriptionPattern = /{{description}}/g;
+        const homeTemplate = await fs.readFile("./views/home/home.html", "utf-8")
+        const catTemplate = await fs.readFile("./views/CatTemplate.html", "utf-8")
 
-       const catHtml = cats.map((cat) => catTemplate.replace(imagePattern,cat.imageUrl)
-       .replace(namePattern,cat.name)
-       .replace(breedPattern,cat.breed)
-       .replace(descriptionPattern,cat.description))
-    
-       const homeHtml = homeTemplate.replace("{{cats}}", catHtml)
+        const catHtml = cats.map((cat) => catTemplate.replace(imagePattern, cat.imageUrl)
+            .replace(namePattern, cat.name)
+            .replace(breedPattern, cat.breed)
+            .replace(descriptionPattern, cat.description))
+
+        const homeHtml = homeTemplate.replace("{{cats}}", catHtml)
 
         res.writeHead(200, { "Content-Type": "text/html" })
         res.write(homeHtml)
     } else if (url === "/content/styles/site.css") {
+        const siteCss = await fs.readFile("./content/styles/site.css", "utf-8")
         res.writeHead(200, { "Content-Type": "text/css" })
         res.write(siteCss)
     } else if (url === "/cats/add-breed") {
+        const addBreedTemplate = await fs.readFile("./views/addBreed.html", "utf-8")
         res.writeHead(200, { "Content-Type": "text/html" })
         res.write(addBreedTemplate)
     } else if (url === "/cats/add-cat") {
+        const addCatTemplate = await fs.readFile("./views/addCat.html", "utf-8")
         res.writeHead(200, { "Content-Type": "text/html" })
         res.write(addCatTemplate)
+    } else if (url === "/content/images/favicon.ico" || url === "/favicon.ico") {
+        const favIcon = await fs.readFile("./content/images/favicon.ico")
+        res.writeHead(200, { "Content-Type": "image/x-icon" })
+        res.write(favIcon)
     }
     res.end()
 });
